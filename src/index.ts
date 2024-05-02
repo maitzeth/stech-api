@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { modems } from './db/schema';
-import { Client } from './db';
+
+import modemsRoutes from './resources/modems';
 
 export type Env = {
   DATABASE_URL: string;
@@ -8,13 +8,10 @@ export type Env = {
 
 const app = new Hono<{Bindings: Env}>();
 
+app.route("/", modemsRoutes);
+
 app.get('/', async (c) => {
-	const client = new Client(c.env.DATABASE_URL);
-	const response = await client.db.select().from(modems);
-	
-	console.log(response);
-  // // const allProducts = await db.select().from(products);
-  return c.json({ hello: 'world' });
+	c.text('Hello world ;)');
 });
 
 export default app;
