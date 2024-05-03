@@ -71,3 +71,18 @@ export async function updateCableModem(dbUrl: string, modemId: string, data: Mod
   
   return updatedUserId;
 }
+
+export async function deleteCableModem(dbUrl: string, modemId: string) {
+  const client = httpClient(dbUrl);
+
+  // For this use case i will delete the row.
+  // But I was thinking about adding a new column name published: true/false
+  // And update that value instead of delete the row for audit porpuses.
+  const response = await client.delete(modems).where(eq(modems.id, modemId));
+
+  if (response.rowCount === 0) {
+    throw new CustomError('Cablemodem not found', 404);
+  }
+  
+  return response;
+}

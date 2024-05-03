@@ -4,7 +4,8 @@ import {
   getCableModems,
   createCableModem,
   getCableModemById,
-  updateCableModem
+  updateCableModem,
+  deleteCableModem
 } from './modems.controller';
 import { withErrorHandling } from '../utils/error';
 import { ModemRequest } from '../types/modems';
@@ -38,6 +39,12 @@ modemsApp.put('/:id', validatePayload, validateDateTime, withErrorHandling(async
   const param = c.req.param() as { id: string };
   const response = await updateCableModem(c.env.DATABASE_URL, param.id, body);
   return c.json(response, 201);
+}));
+
+modemsApp.delete('/:id', withErrorHandling(async (c) => {
+  const param = c.req.param() as { id: string };
+  await deleteCableModem(c.env.DATABASE_URL, param.id);
+  return new Response(null, { status: 204 });
 }));
 
 export default modemsApp;
