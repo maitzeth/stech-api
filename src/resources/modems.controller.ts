@@ -5,8 +5,8 @@ import { eq } from 'drizzle-orm';
 import { CustomError } from '../utils/error';
 import { cableModemResponseMapper } from '../utils/modem';
 
-export async function getCableModems(baseUrl: string) {
-  const client = httpClient(baseUrl);
+export async function getCableModems(dbUrl: string) {
+  const client = httpClient(dbUrl);
   const response = await client.query.modems.findMany({
     columns: {
       id: true,
@@ -21,8 +21,8 @@ export async function getCableModems(baseUrl: string) {
   return response;
 };
 
-export async function createCableModem(baseUrl: string, body: ModemRequest) {
-  const client = httpClient(baseUrl);
+export async function createCableModem(dbUrl: string, body: ModemRequest) {
+  const client = httpClient(dbUrl);
   const { 0: response } = await client.insert(modems).values({
     description: body.description,
     name: body.name,
@@ -40,8 +40,8 @@ export async function createCableModem(baseUrl: string, body: ModemRequest) {
   return response;
 };
 
-export async function getCableModemById(baseUrl: string, modemId: string) {
-  const client = httpClient(baseUrl);
+export async function getCableModemById(dbUrl: string, modemId: string) {
+  const client = httpClient(dbUrl);
 
   const rows = await client.select()
     .from(modems)
@@ -53,4 +53,21 @@ export async function getCableModemById(baseUrl: string, modemId: string) {
   }
 
   throw new CustomError('Cablemodem not found', 404);
+}
+
+export async function updateCableModem(dbUrl: string, modemId: string, data: ModemRequest) {
+  const client = httpClient(dbUrl);
+  const { 0: updatedUserId } = await client.update(modems)
+    .set({
+      name: data.name,
+      description: data.description,
+      status: data.status,
+      validSince: data.validSince,
+      tags: data.tags,
+      updatedAt: new Date(),
+    })
+    .where(eq(modems.id, modemId))
+    .returning({ id: modems.id });
+  
+  return updatedUserId;
 }
