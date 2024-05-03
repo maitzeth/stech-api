@@ -1,16 +1,12 @@
-import { neon, NeonQueryFunction } from '@neondatabase/serverless';
-import { NeonHttpDatabase, drizzle } from 'drizzle-orm/neon-http';
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import * as schema from "../db/schema";
+export function httpClient(baseUrl: string) {
+  const sql = neon(baseUrl);
 
-export class Client {
-  private readonly sql: NeonQueryFunction<any, any>;
-  readonly db: NeonHttpDatabase<Record<string, never>>;
+  const db = drizzle(sql, {
+    schema,
+  });
 
-  constructor(baseUrl: string | undefined) {
-    if (!baseUrl) {
-      throw new Error('DATABASE_URL environment variable is required');
-    }
-
-    this.sql = neon(baseUrl);
-    this.db = drizzle(this.sql);
-  }
-};
+  return db;
+} 
