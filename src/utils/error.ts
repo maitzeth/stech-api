@@ -22,9 +22,6 @@ export function withErrorHandling(handler: HonoHandler): HonoHandler {
 
       if (error instanceof CustomError) {
         return context.json({ message: errorMsg }, error.status as any);
-      } else if (error instanceof ZodError) {
-        const errors = error.issues[0].message; // Always get the first error
-        return context.json({ message: errors }, 400);
       }
 
       return context.json({ message: errorMsg }, 400);
