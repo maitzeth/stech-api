@@ -1,6 +1,9 @@
 import { httpClient } from '../db';
 import { ModemRequest } from '../types/modems';
 import { modems } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { CustomError } from '../utils/error';
+import { cableModemResponseMapper } from '../utils/modem';
 
 export async function getCableModems(baseUrl: string) {
   const client = httpClient(baseUrl);
@@ -35,4 +38,19 @@ export async function createCableModem(baseUrl: string, body: ModemRequest) {
     tags: modems.tags,
   });
   return response;
+};
+
+export async function getCableModemById(baseUrl: string, modemId: string) {
+  const client = httpClient(baseUrl);
+
+  const rows = await client.select()
+    .from(modems)
+    .where(eq(modems.id, modemId))
+
+  if (rows.length > 0) {
+    const { 0: cableModem } = rows;
+    return cableModemResponseMapper(cableModem);
+  }
+
+  throw new CustomError('Cablemodem not found', 404);
 }
