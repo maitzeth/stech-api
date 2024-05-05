@@ -1,6 +1,7 @@
 import type {  Context, Next } from 'hono';
 import { modemBlueprint } from '../db/schema'
 import { ModemRequest } from '../types/modems';
+import { HTTPException } from 'hono/http-exception'
 
 export const validatePayload = async (c: Context<any, any, {}>, next: Next) => {
   const body = await c.req.json() as ModemRequest;
@@ -10,7 +11,7 @@ export const validatePayload = async (c: Context<any, any, {}>, next: Next) => {
   if (!result.success) {
     const singleErrorMsg = result.error.issues[0].message;
 
-    return c.json({ message: singleErrorMsg }, 400);
+    throw new HTTPException(400, { message:singleErrorMsg });
   }
 
   await next();
@@ -25,7 +26,7 @@ export const validateDateTime = async (c: Context<any, any, {}>, next: Next) => 
   const result = regex.test(validSinceValue);
 
   if (!result) {
-    return c.json({ message: 'Invalid validSince value' }, 400);
+    throw new HTTPException(400, { message: 'Invalid validSince value' });
   }
 
   await next();

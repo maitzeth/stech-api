@@ -1,12 +1,18 @@
 import { httpClient } from '../db';
 import { ModemRequest } from '../types/modems';
 import { modems } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, like } from 'drizzle-orm';
 import { CustomError } from '../utils/error';
 import { cableModemResponseMapper } from '../utils/modem';
 
-export async function getCableModems(dbUrl: string) {
+export async function getCableModems(dbUrl: string, querySearch: string | undefined) {
   const client = httpClient(dbUrl);
+
+  if (querySearch) {
+    const rows = await client.select().from(modems).where(like(modems.name, `%${querySearch}%`));
+    return rows;
+  }
+
   const response = await client.query.modems.findMany({
     columns: {
       id: true,
@@ -67,7 +73,14 @@ export async function updateCableModem(dbUrl: string, modemId: string, data: Mod
       updatedAt: new Date(),
     })
     .where(eq(modems.id, modemId))
-    .returning({ id: modems.id });
+    .returning({
+      id: modems.id,
+      name: modems.name,
+      description: modems.description,
+      status: modems.status,
+      validSince: modems.validSince,
+      tags: modems.tags
+    });
   
   return updatedUserId;
 }
@@ -75,9 +88,9 @@ export async function updateCableModem(dbUrl: string, modemId: string, data: Mod
 export async function deleteCableModem(dbUrl: string, modemId: string) {
   const client = httpClient(dbUrl);
 
-  // For this use case i will delete the row.
-  // But I was thinking about adding a new column name published: true/false
-  // And update that value instead of delete the row for audit porpuses.
+  // For this use case i will physically delete the row.
+  // But I was thinking about adding a new column name published: true/false to delete virtually
+  // And update that value instead of delete the row for audit purposes.
   const response = await client.delete(modems).where(eq(modems.id, modemId));
 
   if (response.rowCount === 0) {

@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { ZodError } from 'zod';
+import { HTTPException } from 'hono/http-exception'
 
 export class CustomError extends Error {
   status: number;
@@ -21,10 +21,10 @@ export function withErrorHandling(handler: HonoHandler): HonoHandler {
       const errorMsg = (error as Error).message;
 
       if (error instanceof CustomError) {
-        return context.json({ message: errorMsg }, error.status as any);
+        throw new HTTPException(error.status as any, { message: error.message });
       }
 
-      return context.json({ message: errorMsg }, 400);
+      throw new HTTPException(500, { message: errorMsg });
     }
   };
 }

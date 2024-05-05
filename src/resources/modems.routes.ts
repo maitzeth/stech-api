@@ -15,7 +15,9 @@ const modemsApp = new Hono<{Bindings: Env}>().basePath('/cableModems');
 
 // :GET
 modemsApp.get('/', withErrorHandling(async (c) => {
-  const response = await getCableModems(c.env.DATABASE_URL);
+  const querySearch = c.req.query() as { q: string } | undefined; 
+
+  const response = await getCableModems(c.env.DATABASE_URL, querySearch?.q);
   return c.json(response, 200);
 }));
 
