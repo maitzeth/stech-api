@@ -1,3 +1,34 @@
+# Stech API - Cloudflare Workers + Hono + Neon
+
+## Tech Stack
+- Drizzle ORM to manage migrations and as a query builder
+- Cloudflare Worker (Cheap to run, Blazing fast and great DX)
+- Hono.js lightweight fast framework for the edges (great with cloudflare workers)
+- Neon.tech to manage serverless postgres
+
+# Requirements
+```bash
+Nodejs >= 20
+```
+
+## Installation
+```bash
+npm install
+```
+
+## Running the app
+
+```bash
+npm run dev
+```
+
+> Dont forget to rename file called .env.vars.example > .env.vars.
+
+
+## API Documentation
+
+### Cable Modems
+
 Este documento describe la API REST para la gestión de dispositivos. La API permite crear, consultar, actualizar y eliminar dispositivos del sistema.
 
 ## Recursos
@@ -19,7 +50,7 @@ La API soporta los siguientes métodos HTTP:
 
 ```json
 {
-  "id": "string" (opcional)
+  "id": "string" (opcional),
   "name": "string",
   "description": "string",
   "status": "string",
